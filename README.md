@@ -89,7 +89,7 @@ If you want to contribute to this project the following information will be help
 1. If you update to the latest source code and there are new dependencies you will need to run `algokit bootstrap all` again
 2. Follow step 3 above
 
-### Building examples
+## Building examples
 
 In the `examples` folder there is a series of example contracts along with their generated client. These contracts are built using [Algorand Python](https://github.com/algorandfoundation/puya).
 
@@ -107,7 +107,7 @@ To regenerate the generated clients run `npm run update-approvals`.
 
 This project uses [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) to define CI/CD workflows, which are located in the [`.github/workflows`](./.github/workflows) folder.
 
-## Approval tests
+### Approval tests
 
 Making any changes to the generated code will result in the approval tests failing. The approval tests work by generating a version of client
 and outputting it to `./examples/APP_NAME/client.generated.ts` then comparing to the approved version `./examples/APP_NAME/client.ts`. If you
