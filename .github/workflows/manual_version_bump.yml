@@ -29,8 +29,12 @@ jobs:
 
       - name: Create and push version tag
         run: |
-          git tag -a "v$((${{ inputs.version }} - 1))" -m "Version $((${{ inputs.version }} - 1))"
-          git push origin "v$((${{ inputs.version }} - 1))"
+          MAJOR_VERSION=$(echo "${{ inputs.version }}" | cut -d. -f1)
+          PREV_MAJOR=$(expr $MAJOR_VERSION - 1)
+          PREV_VERSION="${PREV_MAJOR}.0.0"
+          echo "PREV_VERSION: $PREV_VERSION"
+          git tag -a "v${PREV_VERSION}" -m "Version ${PREV_VERSION}"
+          git push origin "v${PREV_VERSION}"
 
       - name: Create empty commit for version bump
         run: |
