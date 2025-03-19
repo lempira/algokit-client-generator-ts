@@ -89,7 +89,7 @@ If you want to contribute to this project the following information will be help
 1. If you update to the latest source code and there are new dependencies you will need to run `algokit bootstrap all` again
 2. Follow step 3 above
 
-### Building examples
+## Building examples
 
 In the `examples` folder there is a series of example contracts along with their generated client. These contracts are built using [Algorand Python](https://github.com/algorandfoundation/puya).
 
