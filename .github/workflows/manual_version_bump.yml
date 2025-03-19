@@ -1,0 +1,73 @@
+name: Manual Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Target version (e.g., 500.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: release
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Create temporary release config
+        run: |
+          cat > .releaserc.json << EOF
+          {
+            "branches": ["release"],
+            "plugins": [
+              ["@semantic-release/npm", {
+                "npmPublish": false
+              }],
+              ["@semantic-release/git", {
+                "message": "chore(release): ${version} [skip ci]"
+              }],
+              "@semantic-release/github"
+            ],
+            "tagFormat": "v${version}"
+          }
+          EOF
+
+      - name: Force version bump
+        run: |
+          export NEXT_VERSION=${{ inputs.version }}
+          npx semantic-release --no-ci --extends .releaserc.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Cleanup temporary config
+        run: rm .releaserc.json
+
+      - name: Trigger main release workflow
+        run: |
+          gh workflow run 'Publish' --ref release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for release workflow
+        run: |
+          echo "Waiting for release workflow to complete..."
+          sleep 30  # Give time for the workflow to start
+          gh run watch $(gh run list --workflow=Publish --branch release --json databaseId --jq '.[0].databaseId')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
